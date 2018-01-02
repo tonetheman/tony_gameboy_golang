@@ -62,7 +62,10 @@ func interp(cpu *CPU, data []byte) {
 			fmt.Printf("jmp nn %d %d %d\n", byte0, byte1, jmpVal)
 
 		default:
-			fmt.Println("ERR: unknown instruction!!!")
+			fmt.Println("ERR: unknown instruction!!!", cpu.pc, curInstr)
+			cpu.pc = dataLen // this will force the program
+			// to stop
+
 			break
 		} // end of switch
 
@@ -92,6 +95,7 @@ func test_nop() {
 	var cpu CPU
 	cpu.pc = 0x00
 	data := make([]byte, 10)
+	data[9] = 0x01
 	fmt.Println("cpu.pc, cycles", cpu.pc, cpu.cycles)
 	interp(&cpu, data)
 	fmt.Println("cpu.pc, cycles", cpu.pc, cpu.cycles)

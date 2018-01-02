@@ -13,17 +13,23 @@ type CPU struct {
 	sf               bool
 	hcf              bool
 	cf               bool
+	cycles           int
 }
 
 func interp(cpu *CPU, data []byte) {
 	count := 0
 	for {
 		curInstr := data[cpu.pc]
-		cpu.pc++
 
 		switch curInstr {
-		// LD nn,n
+		case 0x00:
+			// nop
+			cpu.cycles += 1
+			cpu.pc++
+
+			// LD nn,n
 		case 0x06, 0x0e, 0x16, 0x1e, 0x26, 0x2e:
+			cpu.pc++
 			if curInstr == 0x06 {
 				cpu.b = data[cpu.pc]
 			} else if curInstr == 0x0e {
@@ -41,13 +47,13 @@ func interp(cpu *CPU, data []byte) {
 			// JP nn
 		case 0xc3:
 			// LS byte first
-			// TODO: figure out how to interpret
-			// the two bytes to an address
+			cpu.pc++
 			byte0 := data[cpu.pc]
 			cpu.pc++
 			byte1 := data[cpu.pc]
 			cpu.pc++
-			fmt.Printf("jmp nn %d %d\n", byte0, byte1)
+			var jmpVal = int(byte0) | int(byte1)<<8
+			fmt.Printf("jmp nn %d %d %d\n", byte0, byte1, jmpVal)
 
 		default:
 		} // end of switch

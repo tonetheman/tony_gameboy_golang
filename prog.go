@@ -17,14 +17,20 @@ type CPU struct {
 }
 
 func interp(cpu *CPU, data []byte) {
-	count := 0
+	//count := 0
+	dataLen := len(data)
 	for {
+		if cpu.pc >= dataLen {
+			fmt.Println("ERR: end of runway")
+			break
+		}
 		curInstr := data[cpu.pc]
 
 		switch curInstr {
 		case 0x00:
 			// nop
-			cpu.cycles += 1
+			fmt.Printf("nop\n")
+			cpu.cycles++
 			cpu.pc++
 
 			// LD nn,n
@@ -56,16 +62,17 @@ func interp(cpu *CPU, data []byte) {
 			fmt.Printf("jmp nn %d %d %d\n", byte0, byte1, jmpVal)
 
 		default:
+			fmt.Println("ERR: unknown instruction!!!")
+			break
 		} // end of switch
 
-		if count == 0 {
-			break
-		}
+		//if count == 0 {
+		//	break
+		//}
 	} // end of main loop
 }
 
-func main() {
-
+func realROM() {
 	data, err := ioutil.ReadFile("tetris_world.gb")
 	if err != nil {
 		fmt.Println("could not read file", err)
@@ -78,4 +85,18 @@ func main() {
 	var cpu CPU
 	cpu.pc = 0x100
 	interp(&cpu, data)
+
+}
+
+func test_nop() {
+	var cpu CPU
+	cpu.pc = 0x00
+	data := make([]byte, 10)
+	fmt.Println("cpu.pc, cycles", cpu.pc, cpu.cycles)
+	interp(&cpu, data)
+	fmt.Println("cpu.pc, cycles", cpu.pc, cpu.cycles)
+}
+
+func main() {
+	test_nop()
 }
